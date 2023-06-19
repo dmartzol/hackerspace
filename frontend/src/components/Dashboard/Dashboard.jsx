@@ -9,7 +9,7 @@ export default function Dashboard() {
         <NavMenu />
         <div className="w-screen">
           <NavBar />
-          <div class="p-4 m-0">
+          <div class="p-4 m-0 bg-gray-50">
             <p>
               <b>Content Here</b>
             </p>
