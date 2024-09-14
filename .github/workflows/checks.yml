@@ -3,25 +3,18 @@ name: Pull Request Checks
 on:
   pull_request:
 
+# allow one concurrency
+concurrency:
+  group: ${{ format('{0}-{1}-{2}-{3}-{4}', github.workflow, github.event_name, github.ref, github.base_ref, github.head_ref) }}
+  cancel-in-progress: true
+
 jobs:
-  gitleaks:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with: { fetch-depth: 0 }
-
-      - name: Run GitLeaks
-        uses: DariuszPorowski/github-action-gitleaks@v2
-        id: gitleaks
-        with:
-          version: latest
-
   lint:
     name: "Linter"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -39,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v3

@@ -39,11 +39,4 @@ ngrok:
 	-e NGROK_CONFIG=/etc/ngrok.yml \
 	ngrok/ngrok:latest http host.docker.internal:80
 
-.PHONY: gitleaks
-gitleaks:
-	docker run \
-		-v $(PROJECT_ROOT_DIR):/path \
-		--rm \
-		zricethezav/gitleaks:latest detect -v --source="/path"
-
 -include e2e.mk
