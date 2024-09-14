@@ -1,3 +1,5 @@
+# Define a build-time variable for the app name
+ARG APP_NAME=backend
 
 # Start from golang base image
 FROM --platform=$BUILDPLATFORM golang:1.19-alpine AS builder
@@ -11,15 +13,15 @@ ENV GOCACHE /go-build
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod/cache go mod download
 COPY . .
-# Build the Go app
+# Build the Go app using the APP_NAME variable
 RUN --mount=type=cache,target=/go/pkg/mod/cache \
     --mount=type=cache,target=/go-build \
-    go build -o backend ./cmd/backend
+    go build -o $APP_NAME ./cmd/$APP_NAME
 
 # Start a new stage from alpine
 FROM alpine:3.17.2 as final
 RUN apk --no-cache add tzdata
 WORKDIR /dist
-# Copy the build artifacts from the previous stage
-COPY --from=builder /build/backend .
-CMD ["/dist/backend"]
+# Copy the build artifacts from the previous stage using the APP_NAME variable
+COPY --from=builder /build/$APP_NAME .
+CMD ["/dist/$APP_NAME"]

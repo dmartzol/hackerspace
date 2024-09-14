@@ -1,0 +1,6 @@
+with-expecter: true
+packages:
+  github.com/dmartzol/hmm/my-package:
+        interfaces:
+          my-iface:
+

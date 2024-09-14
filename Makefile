@@ -46,4 +46,14 @@ gitleaks:
 		--rm \
 		zricethezav/gitleaks:latest detect -v --source="/path"
 
+.PHONY: mocks
+mocks:
+	docker run \
+		--rm \
+		-e GOPRIVATE=$GOPRIVATE \
+		-v "$(HOME)/.gitconfig:/root/.gitconfig" \
+		--volume "$(PROJECT_ROOT_DIR):/$(PROJECT_NAME)" \
+		--workdir /$(PROJECT_NAME) \
+		vektra/mockery:v2.35
+
 -include e2e.mk
