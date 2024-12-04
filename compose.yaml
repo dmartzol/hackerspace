@@ -1,6 +1,4 @@
-version: "3.8"
 services:
-
   nginx:
     container_name: nginx
     image: nginx:1.23
@@ -16,8 +14,8 @@ services:
 
   postgres:
     container_name: postgres
-    image: postgres:15.0-alpine 
-    restart: always
+    image: postgres:15.0-alpine
+    restart: no
     user: postgres
     volumes:
       - postgres_volume:/var/lib/postgresql/data
@@ -30,14 +28,23 @@ services:
     expose:
       - 5432
     healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}" ]
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-q",
+          "-d",
+          "${POSTGRES_DB}",
+          "-U",
+          "${POSTGRES_USER}",
+        ]
       interval: 1s
       timeout: 5s
       retries: 10
 
   backend:
     container_name: backend
-    restart: "no"
+    restart: no
     build:
       context: .
       dockerfile: cmd/backend/Dockerfile
@@ -82,7 +89,7 @@ services:
   backups:
     container_name: backups
     image: prodrigestivill/postgres-backup-local:15
-    restart: always
+    restart: no
     user: postgres:postgres # Optional: see below
     volumes:
       - ./dbbackups:/backups
@@ -108,9 +115,9 @@ services:
 
   frontend:
     container_name: frontend
-    restart: always
+    restart: no
     build:
-      context: frontend
+      context: frontend/
       target: development
     ports:
       - 3000:3000
@@ -128,7 +135,7 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
     ports:
       - 9090:9090
-    restart: unless-stopped
+    restart: no
     volumes:
       - ./config/prometheus:/etc/prometheus
       - prometheus_data:/prometheus
@@ -140,7 +147,7 @@ services:
       - 3001:3000
     expose:
       - 3001
-    restart: unless-stopped
+    restart: no
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=grafana
@@ -161,20 +168,20 @@ services:
   otel:
     container_name: otel
     image: otel/opentelemetry-collector:0.61.0
-    command: [ "--config=/etc/otel-collector.yaml" ]
+    command: ["--config=/etc/otel-collector.yaml"]
     volumes:
       - ./config/otel-collector/otel-collector.yaml:/etc/otel-collector.yaml
 
   tempo:
     container_name: tempo
     image: grafana/tempo:2.1.1
-    command: [ "-config.file=/etc/tempo.yaml" ]
+    command: ["-config.file=/etc/tempo.yaml"]
     volumes:
       - ./config/tempo/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/tmp/tempo
     ports:
-      - "3200"   # tempo
-      - "4317"  # otlp grpc
+      - "3200" # tempo
+      - "4317" # otlp grpc
 
 volumes:
   postgres_volume:
